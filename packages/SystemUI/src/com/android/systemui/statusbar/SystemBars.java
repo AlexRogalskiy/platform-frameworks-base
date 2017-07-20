@@ -86,10 +86,7 @@ public class SystemBars extends SystemUI implements ServiceMonitor.Callbacks {
 
     private void createStatusBarFromConfig() {
         if (DEBUG) Log.d(TAG, "createStatusBarFromConfig");
-        String clsName = mContext.getString(R.string.config_statusBarComponent);
-        if ("box".equals(SystemProperties.get("ro.target.product", "tablet"))){
-            clsName = "com.android.systemui.statusbar.tv.TvStatusBar";
-        }
+        final String clsName = mContext.getString(R.string.config_statusBarComponent);
         if (clsName == null || clsName.length() == 0) {
             throw andLog("No status bar component configured", null);
         }

@@ -1326,35 +1326,6 @@ final class ActivityStack {
             // since it is no longer visible.
             if (prev != null) {
                 prev.stopFreezingScreenLocked(true /*force*/);
-	    if((("true".equals(SystemProperties.get("ro.config.low_ram", "false"))) /*|| ("true".equals(SystemProperties.get("ro.mem_optimise.enable", "false")))*/)
-	    	 && (!"true".equals(SystemProperties.get("cts_gts.status", "false"))))
-   	    {
-		ActivityStack topStack = mStackSupervisor.getFocusedStack();
-		ActivityRecord next = topStack.topRunningActivityLocked();
-		if(next == null)
-			next = mResumingActivity; 
-
-
-		if(DEBUG_LOWMEM)Slog.d("xzj","-----------prev= "+prev+" next= "+next);
-		if((prev.task != next.task)&&(!prev.packageName.equals(next.packageName)))
-		{
-			String prevstring = prev.toString();
-			if(!shouldExcludePrevApp(prevstring))
-			{
-				String nextstring = next.toString();
-				if(!shouldExcludeNextApp(nextstring))
-				{
-					if(DEBUG_LOWMEM)Slog.d("xzj","------pause packages "+prevstring+" next = "+ nextstring);
-					mService.killAppAtUsersRequest(prev.app, null);
-				}
-			}
-		}
-		if(mService.mGameMap.get(prev.processName) != null)
-		{
-			mService.killAllBackgroundProcesses();
-			if(DEBUG_LOWMEM)Slog.v("xzj", "----clean memory for stop " + prev.processName);                                      
-		}
-	    }
             }
             mPausingActivity = null;
         }
@@ -2164,39 +2135,6 @@ final class ActivityStack {
         return result;
     }
 
-    boolean shouldExcludePrevApp(String prevApp) {
-	    if(prevApp == null)
-	    {
-		if(DEBUG_LOWMEM)Slog.d("xzj","---prevApp is null in shouldExcludePrevApp--");
-		return false;
-	    }
-            int N = mService.mExcludePrevApp.size();
-            for (int i=0; i<N; i++) {
-		if(prevApp.contains(mService.mExcludePrevApp.get(i)))
-		{
-			if(DEBUG_LOWMEM)Slog.d("xzj","------shouldExcludePrevApp prevApp= "+prevApp);
-			return true;
-		}
-            }
-	    return false;
-    }
-
-    boolean shouldExcludeNextApp(String nextApp) {
-            if(nextApp == null)
-            {
-                if(DEBUG_LOWMEM)Slog.d("xzj","---nextApp is null in shouldExcludeNextApp--");
-                return false;
-            }
-            int N = mService.mExcludeNextApp.size();
-            for (int i=0; i<N; i++) {
-                if(nextApp.contains(mService.mExcludeNextApp.get(i)))
-                {
-                        if(DEBUG_LOWMEM)Slog.d("xzj","------shouldExcludeNextApp nextApp= "+nextApp);
-                        return true;
-                }
-            }
-            return false;
-    }
     private boolean resumeTopActivityInnerLocked(ActivityRecord prev, ActivityOptions options) {
         if (DEBUG_LOCKSCREEN) mService.logLockScreen("");
 

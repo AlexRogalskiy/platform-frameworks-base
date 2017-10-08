@@ -1244,26 +1244,6 @@ final class ActivityRecord {
     }
 
     void windowsDrawnLocked() {
-	//Launcher is drawn completed,box can exit bootanim, other product  wait for keygurad drawn
-	if(shortComponentName!=null && !shortComponentName.contains(".FallbackHome") && !"1".equals(SystemProperties.get("service.bootanim.exit")))
-	{
-
-		if(("vr".equals(SystemProperties.get("ro.target.product")))||
-		  ("box".equals(SystemProperties.get("ro.target.product")))){//platforms not keyguard
-			Log.d("xzj","----Launcher drawn done,box or vr not keygurad----");
-			boolean wallpaperEnabled = service.mContext.getResources().getBoolean(
-		        	com.android.internal.R.bool.config_enableWallpaperService);
-			if(wallpaperEnabled){
-				Log.d("xzj","----Launcher drawn done,not keyguradk,has wallpaper,ummmmmm----");
-				try {
-					Thread.sleep(1000);
-				} catch (Exception e) {																	                }
-			}
-			Log.d("xzj","----launcher drawn done,exit bootanim----");
-			SystemProperties.set("service.bootanim.exit", "1");	
-			SystemService.stop("bootanim");
-		}
-	}
         mStackSupervisor.mActivityMetricsLogger.notifyWindowsDrawn();
         if (displayStartTime != 0) {
             reportLaunchTimeLocked(SystemClock.uptimeMillis());

@@ -23,7 +23,6 @@ import com.android.systemui.SystemUI;
 
 import static android.content.pm.PackageManager.FEATURE_LEANBACK;
 import static android.content.pm.PackageManager.FEATURE_PICTURE_IN_PICTURE;
-import static android.content.pm.PackageManager.FEATURE_LEANBACK_ONLY;
 
 /**
  * Controls the picture-in-picture window for TV devices.
@@ -35,7 +34,7 @@ public class PipUI extends SystemUI {
     public void start() {
         PackageManager pm = mContext.getPackageManager();
         mSupportPip = pm.hasSystemFeature(FEATURE_PICTURE_IN_PICTURE)
-                && (pm.hasSystemFeature(FEATURE_LEANBACK) || pm.hasSystemFeature(FEATURE_LEANBACK_ONLY));
+                && pm.hasSystemFeature(FEATURE_LEANBACK);
         if (!mSupportPip) {
             return;
         }

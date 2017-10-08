@@ -18,14 +18,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.view.WindowManagerPolicy.OnKeyguardExitResult;
-import android.os.SystemService;
 
 import com.android.internal.policy.IKeyguardDrawnCallback;
 import com.android.internal.policy.IKeyguardExitCallback;
 import com.android.internal.policy.IKeyguardService;
 import com.android.server.UiThread;
 import com.android.server.policy.keyguard.KeyguardStateMonitor.OnShowingStateChangedCallback;
-import com.android.internal.widget.LockPatternUtils;
 
 import java.io.PrintWriter;
 
@@ -53,7 +51,6 @@ public class KeyguardServiceDelegate {
     private final KeyguardState mKeyguardState = new KeyguardState();
     private DrawnListener mDrawnListenerWhenConnect;
     private final OnShowingStateChangedCallback mShowingStateChangedCallback;
-    private LockPatternUtils mLockPatternUtils;
 
     private static final class KeyguardState {
         KeyguardState() {
@@ -97,22 +94,6 @@ public class KeyguardServiceDelegate {
         @Override
         public void onDrawn() throws RemoteException {
             if (DEBUG) Log.v(TAG, "**** SHOWN CALLED ****");
-	    //keyguard drawn complete ,can exit bootanim
-	    if((!"vr".equals(android.os.SystemProperties.get("ro.target.product")))&&
-	       (!"box".equals(android.os.SystemProperties.get("ro.target.product")))&&
-	       (!"1".equals(android.os.SystemProperties.get("service.bootanim.exit")))){//platforms has keyguard service
-		Log.d("xzj","----keygurad drawn done,if keygurad is null?----");
-	    	if (mLockPatternUtils.isLockScreenDisabled(0)){
-			Log.d("xzj","----keygurad drawn done,not keyguradk,ummmmmm----");
-			try {
-				Thread.sleep(3000);
-			} catch (Exception e) {
-			}	    
-		}
-		Log.d("xzj","----keygurad drawn done,exit bootanim----");
-	    	android.os.SystemProperties.set("service.bootanim.exit", "1");
-        	SystemService.stop("bootanim");
-	    }
             if (mDrawnListener != null) {
                 mDrawnListener.onDrawn();
             }
@@ -143,13 +124,6 @@ public class KeyguardServiceDelegate {
         mScrimHandler = UiThread.getHandler();
         mShowingStateChangedCallback = showingStateChangedCallback;
         mScrim = createScrim(context, mScrimHandler);
-	mLockPatternUtils = new LockPatternUtils(context);
-    }
-
-    private boolean isBox() {
-        String boxString = android.os.SystemProperties.get("ro.target.product");
-        boolean isBox = "box".equals(boxString);
-        return isBox;
     }
 
     public void bindService(Context context) {
@@ -161,9 +135,7 @@ public class KeyguardServiceDelegate {
         intent.addFlags(Intent.FLAG_DEBUG_TRIAGED_MISSING);
         intent.setComponent(keyguardComponent);
 
-        boolean isBox = isBox();
-
-        if (isBox || !context.bindServiceAsUser(intent, mKeyguardConnection,
+        if (!context.bindServiceAsUser(intent, mKeyguardConnection,
                 Context.BIND_AUTO_CREATE, mScrimHandler, UserHandle.SYSTEM)) {
             Log.v(TAG, "*** Keyguard: can't bind to " + keyguardComponent);
             mKeyguardState.showing = false;

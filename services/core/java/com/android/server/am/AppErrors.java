@@ -369,16 +369,6 @@ class AppErrors {
 
         int res = result.get();
 
-        if((("true".equals(SystemProperties.get("ro.config.low_ram", "false")))
-		||("true".equals(SystemProperties.get("ro.mem_optimise.enable", "false")))) && (!"true".equals(SystemProperties.get("cts_gts.status", "false")))){
-		if((mService.mProcessMap.get(r.processName) != null)||(mService.mServiceMap.get(r.processName) != null)){
-			if(DEBUG_LOWMEM)Slog.d("xzj","-----hide error msg for filter process "+r);
-			return;
-		}
-	}
-
-
-
         Intent appErrorIntent = null;
         MetricsLogger.action(mContext, MetricsProto.MetricsEvent.ACTION_APP_CRASH, res);
         if (res == AppErrorDialog.TIMEOUT || res == AppErrorDialog.CANCEL) {
@@ -718,17 +708,6 @@ class AppErrors {
                 }
                 return;
             }
-	    if((("true".equals(SystemProperties.get("ro.config.low_ram", "false")))
-		||("true".equals(SystemProperties.get("ro.mem_optimise.enable", "false")))) && (!"true".equals(SystemProperties.get("cts_gts.status", "false"))))
-	    {
-	    	if((mService.mProcessMap.get(proc.processName) != null)||(mService.mServiceMap.get(proc.processName) != null)){
-			if(DEBUG_LOWMEM)Slog.w("xzj", "Skipping crash dialog of " + proc + ": filter");
-			if (res != null) {
-				res.set(0);
-			}
-			return;
-	    }
-							                        }
             final boolean crashSilenced = mAppsNotReportingCrashes != null &&
                     mAppsNotReportingCrashes.contains(proc.info.packageName);
             if ((mService.canShowErrorDialogs() || showBackground) && !crashSilenced) {

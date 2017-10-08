@@ -6070,16 +6070,13 @@ public class WindowManagerService extends IWindowManager.Stub
                 return;
             }
 
-	    //do not exit bootanim,because startHomeActivityLocked will start com.android.settings.FallbackHome,and will show black screen before keygurad
-            /*if (!mBootAnimationStopped) {
+            if (!mBootAnimationStopped) {
                 // Do this one time.
                 Trace.asyncTraceBegin(Trace.TRACE_TAG_WINDOW_MANAGER, "Stop bootanim", 0);
-
-                if (!mRotateOnBoot ) {
                 try {
                     IBinder surfaceFlinger = ServiceManager.getService("SurfaceFlinger");
                     if (surfaceFlinger != null) {
-                        Slog.i(TAG, "******* TELLING SURFACE FLINGER WE ARE BOOTED!");
+                        //Slog.i(TAG_WM, "******* TELLING SURFACE FLINGER WE ARE BOOTED!");
                         Parcel data = Parcel.obtain();
                         data.writeInterfaceToken("android.ui.ISurfaceComposer");
                         surfaceFlinger.transact(IBinder.FIRST_CALL_TRANSACTION, // BOOT_FINISHED
@@ -6090,16 +6087,12 @@ public class WindowManagerService extends IWindowManager.Stub
                     Slog.e(TAG_WM, "Boot completed: SurfaceFlinger is dead!");
                 }
                 mBootAnimationStopped = true;
-                }
             }
-
-            // Set flag first rotate in order to expand duration of window freeze timeout.
-            mFirstRotate = true;
 
             if (!mForceDisplayEnabled && !checkBootAnimationCompleteLocked()) {
                 if (DEBUG_BOOT) Slog.i(TAG_WM, "performEnableScreen: Waiting for anim complete");
                 return;
-            }*/
+            }
 
             EventLog.writeEvent(EventLogTags.WM_BOOT_ANIMATION_DONE, SystemClock.uptimeMillis());
             Trace.asyncTraceEnd(Trace.TRACE_TAG_WINDOW_MANAGER, "Stop bootanim", 0);
